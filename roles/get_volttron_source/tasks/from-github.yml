@@ -1,12 +1,14 @@
 ### download volttron source from github and place at volttron_root
 ### registers `volttron_source_changed` fact (based on hash of tarball)
 ---
-- name: Download volttron repository tarball
+- name: "Download volttron repository tarball [{{ source_url }}]"
   get_url:
-    url: https://github.com/{{ volttron_git_organization }}/{{ volttron_git_repo }}/archive/{{ volttron_git_branch }}.tar.gz
-    dest: "/tmp/volttron-{{ volttron_git_branch }}.tar.gz"
+    url: "{{ source_url }}"
+    dest: "/tmp/volttron-{{ volttron_git_branch | regex_replace('/', '.') }}.tar.gz"
     force: yes
     use_proxy: yes
+  vars:
+    source_url: "https://github.com/{{ volttron_git_organization }}/{{ volttron_git_repo }}/archive/{{ volttron_git_branch }}.tar.gz"
   environment:
     http_proxy: "{{ http_proxy }}"
     https_proxy: "{{ https_proxy }}"
@@ -18,7 +20,7 @@
 
 - name: Stat tar file
   stat:
-    path: "/tmp/volttron-{{ volttron_git_branch }}.tar.gz"
+    path: "/tmp/volttron-{{ volttron_git_branch | regex_replace('/', '.') }}.tar.gz"
     get_checksum: yes
   register: new_tar_stat
 
@@ -36,7 +38,7 @@
   when: volttron_source_changed
   block:
   - name: Move new file
-    command: mv "/tmp/volttron-{{ volttron_git_branch }}.tar.gz" "{{ ansible_env.HOME }}/volttron-source.tar.gz"
+    command: mv "/tmp/volttron-{{ volttron_git_branch | regex_replace('/', '.') }}.tar.gz" "{{ ansible_env.HOME }}/volttron-source.tar.gz"
 
   - name: Remove volttron source root dir if exists
     file:
@@ -58,7 +60,7 @@
       remote_src: yes
 
   - name: Place source tree at volttron root
-    command: mv "/tmp/volttron_source/{{volttron_git_repo}}-{{volttron_git_branch}}" "{{ volttron_root }}"
+    command: mv "/tmp/volttron_source/{{volttron_git_repo}}-{{ volttron_git_branch | regex_replace('/', '-') }}" "{{ volttron_root }}"
   - name: Cleanup unarchive artifacts
     file:
       path: "/tmp/volttron_source"

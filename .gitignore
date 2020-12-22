@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# vagrant files
+examples/.vagrant/*
+
 # Ansible builds
 *.tgz
 *.tar.gz
@@ -103,3 +106,9 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# pycharm
+.idea
+
+# rtd
+/docs/build/*
